@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Manage Students{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Students</h1>
+        <div class="subtitle">{{ students|length }} student(s) registered</div>
+    </div>
+    <a href="{{ url_for('admin_student_add') }}" class="btn btn-brand"><i class="bi bi-person-plus me-1"></i>Add Student</a>
+</div>
+
+<div class="panel mb-4">
+    <div class="panel-body">
+        <form method="get" action="{{ url_for('admin_students') }}" class="row g-2 align-items-end">
+            <div class="col-12 col-md-6">
+                <label class="form-label small">Search</label>
+                <input type="text" name="q" class="form-control" value="{{ q }}" placeholder="Student ID, name, email or branch">
+            </div>
+            <div class="col-12 col-md-auto d-flex gap-2">
+                <button class="btn btn-brand" type="submit"><i class="bi bi-search me-1"></i>Search</button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('admin_students') }}">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Student ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Branch</th><th class="text-center">Year</th><th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td><code>{{ s.student_code }}</code></td>
+                    <td class="fw-semibold">{{ s.name }}</td>
+                    <td>{{ s.email }}</td>
+                    <td>{{ s.phone or '—' }}</td>
+                    <td>{{ s.branch }}</td>
+                    <td class="text-center">{{ s.year }}</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{{ url_for('admin_student_edit', student_id=s.student_id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                        <form method="post" action="{{ url_for('admin_student_delete', student_id=s.student_id) }}" class="d-inline"
+                              data-confirm="Delete student {{ s.name }} and their login account?">
+                            <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">
+                    <div class="empty-state"><i class="bi bi-people"></i>No students match your search.</div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

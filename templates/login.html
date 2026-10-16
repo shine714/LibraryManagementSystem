@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Login - Library Management System{% endblock %}
+{% block public %}
+<div class="login-page">
+    <div class="login-card">
+        <div class="logo"><i class="bi bi-book-half"></i></div>
+        <h1 class="h4 text-center fw-bold mb-1">Library Management</h1>
+        <p class="text-center text-muted small mb-4">Sign in as admin/librarian or student</p>
+
+        <form method="post" action="{{ url_for('login') }}" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" name="username"
+                           placeholder="admin or Student ID" required autofocus>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-brand w-100 py-2 fw-semibold">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Sign in
+            </button>
+        </form>
+
+        <div class="small text-muted mt-4 border-top pt-3">
+            <div><strong>Admin:</strong> admin / admin123</div>
+            <div><strong>Student:</strong> STU001 / student123</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

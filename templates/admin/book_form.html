@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Add' if mode == 'add' else 'Edit' }} Book{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ 'Add New Book' if mode == 'add' else 'Edit Book' }}</h1>
+        <div class="subtitle">{{ 'Fill in the catalogue details.' if mode == 'add' else 'Update the details of this book.' }}</div>
+    </div>
+    <a href="{{ url_for('admin_books') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to books</a>
+</div>
+
+<div class="panel" style="max-width: 760px;">
+    <div class="panel-body p-4">
+        <form method="post"
+              action="{{ url_for('admin_book_add') if mode == 'add' else url_for('admin_book_edit', book_id=book.book_id) }}"
+              novalidate>
+            {% if mode == 'edit' %}
+            <div class="mb-3">
+                <label class="form-label">Book ID</label>
+                <input type="text" class="form-control bg-light" value="#{{ book.book_id }}" disabled>
+            </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ book.title or '' }}" maxlength="200" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="author" class="form-label">Author <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="author" name="author" value="{{ book.author or '' }}" maxlength="120" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="category" name="category" value="{{ book.category or '' }}" maxlength="60" list="categoryList" required>
+                    <datalist id="categoryList">
+                        <option value="Software Engineering"><option value="Algorithms"><option value="Databases">
+                        <option value="Networking"><option value="Operating Systems"><option value="Programming">
+                        <option value="Computer Architecture"><option value="Biography"><option value="Fiction">
+                    </datalist>
+                </div>
+                <div class="col-md-6">
+                    <label for="isbn" class="form-label">ISBN <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="isbn" name="isbn" value="{{ book.isbn or '' }}" maxlength="20" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="quantity" class="form-label">Total Quantity <span class="text-danger">*</span></label>
+                    <input type="number" min="1" class="form-control" id="quantity" name="quantity"
+                           value="{{ book.quantity if book.quantity is defined else 1 }}" required>
+                    {% if mode == 'edit' %}
+                    <div class="form-text">Currently issued copies are kept out of stock automatically.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                <a href="{{ url_for('admin_books') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-brand px-4">
+                    <i class="bi bi-save me-1"></i>{{ 'Add Book' if mode == 'add' else 'Save Changes' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

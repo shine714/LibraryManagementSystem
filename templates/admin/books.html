@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Manage Books{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Books</h1>
+        <div class="subtitle">{{ books|length }} title(s) found</div>
+    </div>
+    <a href="{{ url_for('admin_book_add') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i>Add Book</a>
+</div>
+
+<div class="panel mb-4">
+    <div class="panel-body">
+        <form method="get" action="{{ url_for('admin_books') }}" class="row g-2 filter-bar align-items-end">
+            <div class="col-12 col-md-3">
+                <label class="form-label small">Search (all fields)</label>
+                <input type="text" name="q" class="form-control" value="{{ filters.q }}" placeholder="Title, author, ISBN, category">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Title</label>
+                <input type="text" name="title" class="form-control" value="{{ filters.title }}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Author</label>
+                <input type="text" name="author" class="form-control" value="{{ filters.author }}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All categories</option>
+                    {% for c in categories %}
+                    <option value="{{ c.category }}" {{ 'selected' if filters.category == c.category }}>{{ c.category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Availability</label>
+                <select name="availability" class="form-select">
+                    <option value="">Any</option>
+                    <option value="available" {{ 'selected' if filters.availability == 'available' }}>Available</option>
+                    <option value="unavailable" {{ 'selected' if filters.availability == 'unavailable' }}>Not available</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-1 d-flex gap-1">
+                <button class="btn btn-brand flex-fill" type="submit" title="Apply"><i class="bi bi-funnel"></i></button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('admin_books') }}" title="Clear"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Book ID</th><th>Title</th><th>Author</th><th>Category</th><th>ISBN</th>
+                    <th class="text-center">Quantity</th><th class="text-center">Available</th><th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in books %}
+                <tr>
+                    <td>#{{ b.book_id }}</td>
+                    <td class="fw-semibold">{{ b.title }}</td>
+                    <td>{{ b.author }}</td>
+                    <td><span class="badge badge-soft-muted">{{ b.category }}</span></td>
+                    <td><code>{{ b.isbn }}</code></td>
+                    <td class="text-center">{{ b.quantity }}</td>
+                    <td class="text-center">
+                        {% if b.available_quantity > 0 %}
+                            <span class="badge badge-soft-success">{{ b.available_quantity }}</span>
+                        {% else %}
+                            <span class="badge badge-soft-danger">0</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a href="{{ url_for('admin_book_edit', book_id=b.book_id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                        <form method="post" action="{{ url_for('admin_book_delete', book_id=b.book_id) }}" class="d-inline"
+                              data-confirm="Delete '{{ b.title }}'? This cannot be undone.">
+                            <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">
+                    <div class="empty-state"><i class="bi bi-search"></i>No books match your filters.</div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

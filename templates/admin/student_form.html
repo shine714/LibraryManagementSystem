@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Add' if mode == 'add' else 'Edit' }} Student{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ 'Add New Student' if mode == 'add' else 'Edit Student' }}</h1>
+        <div class="subtitle">
+            {% if mode == 'add' %}
+                A login account is created automatically. The Student ID is the username.
+            {% else %}
+                Changing the Student ID also changes the student's login username.
+            {% endif %}
+        </div>
+    </div>
+    <a href="{{ url_for('admin_students') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to students</a>
+</div>
+
+<div class="panel" style="max-width: 760px;">
+    <div class="panel-body p-4">
+        <form method="post"
+              action="{{ url_for('admin_student_add') if mode == 'add' else url_for('admin_student_edit', student_id=student.student_id) }}"
+              novalidate>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="student_code" class="form-label">Student ID <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="student_code" name="student_code" maxlength="20"
+                           value="{{ student.student_code or '' }}" placeholder="e.g. STU006" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" maxlength="100"
+                           value="{{ student.name or '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="email" name="email" maxlength="120"
+                           value="{{ student.email or '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" maxlength="15"
+                           value="{{ student.phone or '' }}">
+                </div>
+                <div class="col-md-8">
+                    <label for="branch" class="form-label">Branch <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="branch" name="branch" maxlength="60"
+                           value="{{ student.branch or '' }}" placeholder="e.g. Computer Science" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="year" class="form-label">Year <span class="text-danger">*</span></label>
+                    <select class="form-select" id="year" name="year" required>
+                        <option value="">Select</option>
+                        {% for y in range(1, 7) %}
+                        <option value="{{ y }}" {{ 'selected' if (student.year|string) == (y|string) }}>Year {{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <hr class="my-2">
+                    <label for="password" class="form-label">
+                        {{ 'Login Password' if mode == 'add' else 'Reset Login Password' }}
+                        {% if mode == 'add' %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" minlength="6"
+                           placeholder="{{ 'At least 6 characters' if mode == 'add' else 'Leave blank to keep current password' }}"
+                           {{ 'required' if mode == 'add' }}>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                <a href="{{ url_for('admin_students') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-brand px-4">
+                    <i class="bi bi-save me-1"></i>{{ 'Add Student' if mode == 'add' else 'Save Changes' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

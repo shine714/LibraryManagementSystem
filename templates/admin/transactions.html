@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Transactions</h1>
+        <div class="subtitle">Full history of books issued and returned</div>
+    </div>
+    <a href="{{ url_for('admin_issue') }}" class="btn btn-brand"><i class="bi bi-plus-lg me-1"></i>New Issue</a>
+</div>
+
+<div class="panel mb-4">
+    <div class="panel-body">
+        <form method="get" action="{{ url_for('admin_transactions') }}" class="row g-2 align-items-end filter-bar">
+            <div class="col-12 col-md-3">
+                <label class="form-label small">Search</label>
+                <input type="text" name="q" class="form-control" value="{{ filters.q }}" placeholder="Student name, Student ID or book">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="Issued" {{ 'selected' if filters.status == 'Issued' }}>Issued</option>
+                    <option value="Overdue" {{ 'selected' if filters.status == 'Overdue' }}>Overdue</option>
+                    <option value="Returned" {{ 'selected' if filters.status == 'Returned' }}>Returned</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Issued from</label>
+                <input type="date" name="date_from" class="form-control" value="{{ filters.date_from }}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Issued to</label>
+                <input type="date" name="date_to" class="form-control" value="{{ filters.date_to }}">
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-brand flex-fill" type="submit"><i class="bi bi-funnel me-1"></i>Filter</button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('admin_transactions') }}">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Txn ID</th><th>Student</th><th>Book</th><th>Issue Date</th><th>Due Date</th>
+                    <th>Return Date</th><th>Status</th><th class="text-end">Fine</th><th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rows %}
+                <tr>
+                    <td>#{{ r.transaction_id }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ r.student_name }}</div>
+                        <small class="text-muted">{{ r.student_code }}</small>
+                    </td>
+                    <td>{{ r.book_title }}</td>
+                    <td>{{ r.issue_date }}</td>
+                    <td>{{ r.due_date }}</td>
+                    <td>{{ r.return_date or '—' }}</td>
+                    <td>
+                        {% if r.status == 'Returned' %}
+                            <span class="badge badge-soft-success">Returned</span>
+                        {% elif r.is_overdue %}
+                            <span class="badge badge-soft-danger">Overdue</span>
+                        {% else %}
+                            <span class="badge badge-soft-info">Issued</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if r.status == 'Returned' %}
+                            ₹{{ '%.2f'|format(r.fine) }}
+                        {% elif r.is_overdue %}
+                            <span class="text-danger">₹{{ '%.2f'|format((today - r.due_date).days * 5) }} <small>(accruing)</small></span>
+                        {% else %}
+                            ₹0.00
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if r.status == 'Issued' %}
+                        <form method="post" action="{{ url_for('admin_return', txn_id=r.transaction_id) }}" class="d-inline"
+                              data-confirm="Mark '{{ r.book_title }}' as returned by {{ r.student_name }}?">
+                            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-arrow-return-left me-1"></i>Return</button>
+                        </form>
+                        {% else %}
+                            <span class="text-muted small">Closed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="9">
+                    <div class="empty-state"><i class="bi bi-receipt"></i>No transactions match your filters.</div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

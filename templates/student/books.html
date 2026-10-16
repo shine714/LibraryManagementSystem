@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Browse Books{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Browse Books</h1>
+        <div class="subtitle">Search the catalogue and see what is available to borrow from the library desk</div>
+    </div>
+</div>
+
+<div class="panel mb-4">
+    <div class="panel-body">
+        <form method="get" action="{{ url_for('student_books') }}" class="row g-2 align-items-end filter-bar">
+            <div class="col-12 col-md-6">
+                <label class="form-label small">Search</label>
+                <input type="text" name="q" class="form-control" value="{{ filters.q }}" placeholder="Title, author or category">
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label small">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All categories</option>
+                    {% for c in categories %}
+                    <option value="{{ c.category }}" {{ 'selected' if filters.category == c.category }}>{{ c.category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-brand flex-fill" type="submit"><i class="bi bi-search me-1"></i>Search</button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('student_books') }}">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for b in books %}
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card align-items-start flex-column">
+            <div class="d-flex justify-content-between w-100 align-items-start">
+                <span class="badge badge-soft-muted">{{ b.category }}</span>
+                {% if b.available_quantity > 0 %}
+                    <span class="badge badge-soft-success">{{ b.available_quantity }} available</span>
+                {% else %}
+                    <span class="badge badge-soft-danger">Out of stock</span>
+                {% endif %}
+            </div>
+            <div>
+                <div class="fw-bold fs-6 mt-2">{{ b.title }}</div>
+                <div class="text-muted small">by {{ b.author }}</div>
+                <div class="text-muted small mt-1">ISBN: {{ b.isbn }}</div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="panel"><div class="empty-state"><i class="bi bi-search"></i>No books match your search.</div></div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

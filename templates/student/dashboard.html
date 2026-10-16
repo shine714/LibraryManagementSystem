@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Hello, {{ student.name.split(' ')[0] }}!</h1>
+        <div class="subtitle">{{ student.student_code }} · {{ student.branch }} · Year {{ student.year }}</div>
+    </div>
+    <a href="{{ url_for('student_books') }}" class="btn btn-brand"><i class="bi bi-search me-1"></i>Browse Books</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-book"></i></div>
+            <div>
+                <div class="stat-label">Books Currently Issued</div>
+                <div class="stat-value">{{ current|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-calendar-x"></i></div>
+            <div>
+                <div class="stat-label">Overdue Books</div>
+                <div class="stat-value">{{ current|selectattr('is_overdue')|list|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-cash-coin"></i></div>
+            <div>
+                <div class="stat-label">Total Fines</div>
+                <div class="stat-value">₹{{ '%.2f'|format(total_fines) }}</div>
+                <div class="small text-muted">Paid/recorded: ₹{{ '%.2f'|format(paid_fines) }} · Accruing: ₹{{ '%.2f'|format(pending_fine) }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h2><i class="bi bi-bookmark me-1 text-primary"></i>Books Currently With Me</h2>
+        <a href="{{ url_for('student_transactions') }}" class="btn btn-sm btn-outline-primary">Full history</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-modern mb-0">
+            <thead>
+                <tr><th>Book</th><th>Author</th><th>Issued On</th><th>Due Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for c in current %}
+                <tr>
+                    <td class="fw-semibold">{{ c.book_title }}</td>
+                    <td>{{ c.author }}</td>
+                    <td>{{ c.issue_date }}</td>
+                    <td>{{ c.due_date }}</td>
+                    <td>
+                        {% if c.is_overdue %}
+                            <span class="badge badge-soft-danger">Overdue by {{ (today - c.due_date).days }} day(s)</span>
+                        {% else %}
+                            <span class="badge badge-soft-success">{{ (c.due_date - today).days }} day(s) left</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">
+                    <div class="empty-state"><i class="bi bi-inbox"></i>You have no books issued right now.</div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

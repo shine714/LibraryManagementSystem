@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}My History{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>My Transaction History</h1>
+        <div class="subtitle">Every book you have borrowed, with due dates and fines</div>
+    </div>
+</div>
+
+<div class="panel mb-4">
+    <div class="panel-body">
+        <form method="get" action="{{ url_for('student_transactions') }}" class="row g-2 align-items-end filter-bar">
+            <div class="col-12 col-md-4">
+                <label class="form-label small">Book title</label>
+                <input type="text" name="q" class="form-control" value="{{ filters.q }}" placeholder="Search by book title">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All</option>
+                    <option value="Issued" {{ 'selected' if filters.status == 'Issued' }}>Issued</option>
+                    <option value="Overdue" {{ 'selected' if filters.status == 'Overdue' }}>Overdue</option>
+                    <option value="Returned" {{ 'selected' if filters.status == 'Returned' }}>Returned</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">From</label>
+                <input type="date" name="date_from" class="form-control" value="{{ filters.date_from }}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small">To</label>
+                <input type="date" name="date_to" class="form-control" value="{{ filters.date_to }}">
+            </div>
+            <div class="col-12 col-md-2 d-flex gap-2">
+                <button class="btn btn-brand flex-fill" type="submit">Filter</button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('student_transactions') }}">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Txn ID</th><th>Book</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Status</th><th class="text-end">Fine</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rows %}
+                <tr>
+                    <td>#{{ r.transaction_id }}</td>
+                    <td class="fw-semibold">{{ r.book_title }}</td>
+                    <td>{{ r.issue_date }}</td>
+                    <td>{{ r.due_date }}</td>
+                    <td>{{ r.return_date or '—' }}</td>
+                    <td>
+                        {% if r.status == 'Returned' %}
+                            <span class="badge badge-soft-success">Returned</span>
+                        {% elif r.is_overdue %}
+                            <span class="badge badge-soft-danger">Overdue</span>
+                        {% else %}
+                            <span class="badge badge-soft-info">Issued</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if r.status == 'Returned' %}
+                            ₹{{ '%.2f'|format(r.fine) }}
+                        {% elif r.is_overdue %}
+                            <span class="text-danger">₹{{ '%.2f'|format((today - r.due_date).days * 5) }} <small>(accruing)</small></span>
+                        {% else %}
+                            ₹0.00
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">
+                    <div class="empty-state"><i class="bi bi-clock-history"></i>No transactions found.</div>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
