@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Error {{ code }}{% endblock %}
+{% block public %}
+<div class="login-page">
+    <div class="login-card text-center">
+        <div class="display-5 fw-bold text-primary">{{ code }}</div>
+        <p class="text-muted mt-2">{{ message }}</p>
+        <a href="{{ url_for('index') }}" class="btn btn-brand mt-2">Go to home</a>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="empty-state">
+    <div class="display-5 fw-bold">{{ code }}</div>
+    <p>{{ message }}</p>
+    <a href="{{ url_for('index') }}" class="btn btn-brand">Go to home</a>
+</div>
+{% endblock %}
